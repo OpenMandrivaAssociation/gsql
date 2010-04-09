@@ -18,8 +18,9 @@ Requires(postun): desktop-file-utils
 #Requires(postun): scrollkeeper
 BuildRequires:  gtk2-devel, libGConf2-devel, libglade2-devel, libgtksourceview-2.0-devel
 BuildRequires:  libgnome-devel, libgnomeui2-devel, vte-devel, mysql-devel
-BuildRequires:  libnotify-devel desktop-file-utils gettext chrpath
-BuildRequires:  postgresql-devel, %{_lib}ssh-devel
+BuildRequires:  libnotify-devel desktop-file-utils gettext
+#chrpath
+BuildRequires:  postgresql-devel, %{_lib}ssh-devel = 1:
 Requires:       %{name}-engine-mysql = %{version}-%{release}
 Requires:       %{name}-engine-postgresql = %{version}-%{release}
 
