@@ -1,6 +1,6 @@
 Name:           gsql
 Version:        0.2.2
-Release:        %mkrel 2
+Release:        %mkrel 3
 Summary:        Integrated database development tool for GNOME
 Group:          Development/Databases
 License:        GPLv2+
@@ -8,19 +8,13 @@ URL:            http://gsql.org
 Source0:        http://gsql.googlecode.com/files/gsql-%{version}.tar.bz2
 Patch1:		gsql-0.2.2-mysql_cursor-format-not-string-literal-and-no-format.patch
 Patch2:		gsql-0.2.2-DESTDIR-duplicate.patch
+Patch3:		gsql-0.2.2-libnotify0.7.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}
-Requires(post):   desktop-file-utils
-#Requires(post):   scrollkeeper
-Requires(post):   GConf2
-Requires(pre):    GConf2
 Requires(preun):  GConf2
-Requires(postun): desktop-file-utils
-#Requires(postun): scrollkeeper
 BuildRequires:  gtk2-devel, libGConf2-devel, libglade2-devel, libgtksourceview-2.0-devel
 BuildRequires:  libgnome-devel, libgnomeui2-devel, vte-devel, mysql-devel
 BuildRequires:  libnotify-devel desktop-file-utils gettext
-#chrpath
-BuildRequires:  postgresql-devel, %{_lib}ssh-devel >= 1:0.4.2
+BuildRequires:  postgresql-devel, libssh-devel >= 1:0.4.2
 Requires:       %{name}-engine-mysql = %{version}-%{release}
 Requires:       %{name}-engine-postgresql = %{version}-%{release}
 
@@ -90,6 +84,7 @@ PostgreSQL engine for GSQL
 %setup -q 
 %patch1 -p0
 %patch2 -p1 -b .dest
+%patch3 -p0 -b .notify
 
 %build
 %configure2_5x \
