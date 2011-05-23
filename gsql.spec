@@ -1,6 +1,6 @@
 Name:           gsql
 Version:        0.2.2
-Release:        %mkrel 3
+Release:        %mkrel 4
 Summary:        Integrated database development tool for GNOME
 Group:          Development/Databases
 License:        GPLv2+
@@ -10,9 +10,8 @@ Patch1:		gsql-0.2.2-mysql_cursor-format-not-string-literal-and-no-format.patch
 Patch2:		gsql-0.2.2-DESTDIR-duplicate.patch
 Patch3:		gsql-0.2.2-libnotify0.7.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}
-Requires(preun):  GConf2
 BuildRequires:  gtk2-devel, libGConf2-devel, libglade2-devel, libgtksourceview-2.0-devel
-BuildRequires:  libgnome-devel, libgnomeui2-devel, vte-devel, mysql-devel
+BuildRequires:  libgnome2-devel, libgnomeui2-devel, vte-devel, mysql-devel
 BuildRequires:  libnotify-devel desktop-file-utils gettext
 BuildRequires:  postgresql-devel, libssh-devel >= 1:0.4.2
 Requires:       %{name}-engine-mysql = %{version}-%{release}
@@ -39,7 +38,8 @@ universal tool platform tailored against market leading DBMS by providing:
 %package        devel
 Summary:        Development files for %{name}
 Group:          Development/Databases
-Requires:       %{name} = %{version}-%{release} pkgconfig
+Requires:       %{name} = %{version}-%{release}
+Conflicts:	%{name} < 0.2.2-4
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -69,8 +69,6 @@ Requires:       %{name} = %{version}-%{release}
 %description    engine-mysql
 MySQL engine for GSQL
 
-
-
 %package        engine-postgresql
 Summary:        PostgreSQL engine for %{name}
 Group:          Development/Databases
@@ -79,15 +77,15 @@ Requires:       %{name} = %{version}-%{release}
 %description    engine-postgresql
 PostgreSQL engine for GSQL
 
-
 %prep
-%setup -q 
+%setup -q
 %patch1 -p0
 %patch2 -p1 -b .dest
 %patch3 -p0 -b .notify
 
 %build
 %configure2_5x \
+	--disable-schemas-install \
 	--disable-static \
 	--without-oracle \
 	--with-mysql=%{_prefix} \
@@ -100,12 +98,7 @@ PostgreSQL engine for GSQL
 
 %install
 rm -rf %{buildroot}
-export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
-%makeinstall DESTDIR=%{buildroot}
-unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
-#chrpath --delete %{buildroot}%{_bindir}/%{name}
-#chrpath --delete %{buildroot}%{_libdir}/%{name}/*/*.so
-#desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
+%makeinstall DESTDIR=%buildroot
 find %{buildroot} -name '*.la' -delete
 %find_lang %{name}
 # remove improperly placed docs
@@ -115,89 +108,13 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}
 %clean
 rm -rf %{buildroot}
 
-
-#%pre
-#if [ "$1" -gt 1 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}.schemas >/dev/null || :
-#fi
-#
-#
-#%pre plugins
-#if [ "$1" -gt 1 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}-plugins.schemas >/dev/null || :
-#fi
-#
-#
-#%pre engine-mysql
-#if [ "$1" -gt 1 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}-engine-mysql.schemas >/dev/null || :
-#fi
-#
-#
-#%post
-#update-desktop-database -q
-##scrollkeeper-update -q
-#export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#gconftool-2 --makefile-install-rule \
-#  %{_sysconfdir}/gconf/schemas/%{name}.schemas > /dev/null || :
-#/sbin/ldconfig
-#
-#
-#%post plugins
-#export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#gconftool-2 --makefile-install-rule \
-#  %{_sysconfdir}/gconf/schemas/%{name}-plugins.schemas > /dev/null || :
-#
-#
-#%post engine-mysql
-#export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#gconftool-2 --makefile-install-rule \
-#  %{_sysconfdir}/gconf/schemas/%{name}-engine-mysql.schemas > /dev/null || :
-#
-#
-#%preun
-#  if [ "$1" -eq 0 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}.schemas > /dev/null || :
-#fi
-#
-#
-#%preun plugins
-#  if [ "$1" -eq 0 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}-plugins.schemas > /dev/null || :
-#fi
-#
-#
-#%preun engine-mysql
-#  if [ "$1" -eq 0 ] ; then
-#  export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-#  gconftool-2 --makefile-uninstall-rule \
-#    %{_sysconfdir}/gconf/schemas/%{name}-engine-mysql.schemas > /dev/null || :
-#fi
-#
-#
-#%postun
-#update-desktop-database -q
-##scrollkeeper-update -q
-#/sbin/ldconfig
-
-
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
 %{_bindir}/%{name}
 %dir %{_libdir}/%{name}/
 %dir %{_libdir}/%{name}/engines/
-%{_libdir}/lib%{name}*
+%{_libdir}/lib%{name}*.so.*
 %{_sysconfdir}/gconf/schemas/%{name}.schemas
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/glade/
@@ -210,14 +127,15 @@ rm -rf %{buildroot}
 %{_datadir}/applications/%{name}.desktop
 %{_mandir}/man1/*
 
+%preun
+%preun_uninstall_gconf_schemas %{name}
+
 %files devel
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
+%{_libdir}/*.so
 %{_libdir}/pkgconfig/lib%{name}.pc
 %{_includedir}/lib%{name}/
-# scrollkeeper doc generation will be reenabled in future releases
-#%{_datadir}/gtk-doc/html/%{name}
-#%{_datadir}/gnome/help/%{name}
 
 %files plugins
 %defattr(-,root,root,-)
@@ -228,6 +146,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}/ui/plugins/
 %{_datadir}/%{name}/glade/plugins/
 
+%preun plugins
+%preun_uninstall_gconf_schemas %{name}-plugins
+
 %files engine-mysql
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
@@ -237,6 +158,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}/glade/mysql/
 %{_datadir}/pixmaps/%{name}/mysql/
 
+%preun engine-mysql
+%preun_uninstall_gconf_schemas %{name}-engine-mysql
+
 %files engine-postgresql
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
@@ -244,6 +168,3 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}/ui/postgresql/
 %{_datadir}/%{name}/glade/postgresql/
 %{_datadir}/pixmaps/%{name}/postgresql/
-
-
-%changelog
