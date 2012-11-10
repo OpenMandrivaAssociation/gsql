@@ -1,0 +1,25 @@
+--- libgsql/notify.c.libnotify	2011-04-23 07:23:47.000000000 +0200
++++ libgsql/notify.c	2011-04-23 07:25:16.000000000 +0200
+@@ -25,7 +25,9 @@
+ #include <common.h>
+ #include <stock.h>
+ #include <config.h>
+-
++#ifndef NOTIFY_CHECK_VERSION
++#define NOTIFY_CHECK_VERSION(x,y,z) 0
++#endif
+ 
+ static NotifyNotification *notify;
+ 
+@@ -46,7 +48,11 @@
+ 	if (!notify_is_initted())
+ 		notify_init (PROJECT_NAME);
+ 	
++#if NOTIFY_CHECK_VERSION (0, 7, 0)
++	notify = notify_notification_new (subj, message, NULL);
++#else
+ 	notify = notify_notification_new (subj, message, NULL, NULL);
++#endif
+ 	
+ 	notify_notification_set_icon_from_pixbuf(notify, create_pixbuf ("gsql.png"));
+ 	notify_notification_set_timeout (notify, NOTIFY_EXPIRES_DEFAULT);

@@ -1,0 +1,858 @@
+diff -u -r gsql-0.2.2/doc/Makefile.in gsql-0.2.2.aleph//doc/Makefile.in
+--- gsql-0.2.2/doc/Makefile.in	2010-03-25 07:14:31.000000000 +0100
++++ gsql-0.2.2.aleph//doc/Makefile.in	2010-04-08 12:04:47.000000000 +0200
+@@ -283,7 +283,7 @@
+ 	-rm -rf .libs _libs
+ install-man1: $(man_MANS)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(man1dir)" || $(MKDIR_P) "$(DESTDIR)$(man1dir)"
++	test -z "$(man1dir)" || $(MKDIR_P) "$(man1dir)"
+ 	@list=''; test -n "$(man1dir)" || exit 0; \
+ 	{ for i in $$list; do echo "$$i"; done; \
+ 	l2='$(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
+@@ -297,15 +297,15 @@
+ 	sed 'N;N;s,\n, ,g' | { \
+ 	list=; while read file base inst; do \
+ 	  if test "$$base" = "$$inst"; then list="$$list $$file"; else \
+-	    echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man1dir)/$$inst'"; \
+-	    $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man1dir)/$$inst" || exit $$?; \
++	    echo " $(INSTALL_DATA) '$$file' '$(man1dir)/$$inst'"; \
++	    $(INSTALL_DATA) "$$file" "$(man1dir)/$$inst" || exit $$?; \
+ 	  fi; \
+ 	done; \
+ 	for i in $$list; do echo "$$i"; done | $(am__base_list) | \
+ 	while read files; do \
+ 	  test -z "$$files" || { \
+-	    echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(man1dir)'"; \
+-	    $(INSTALL_DATA) $$files "$(DESTDIR)$(man1dir)" || exit $$?; }; \
++	    echo " $(INSTALL_DATA) $$files '$(man1dir)'"; \
++	    $(INSTALL_DATA) $$files "$(man1dir)" || exit $$?; }; \
+ 	done; }
+ 
+ uninstall-man1:
+@@ -373,7 +373,7 @@
+ check: check-am
+ all-am: Makefile $(MANS)
+ installdirs:
+-	for dir in "$(DESTDIR)$(man1dir)"; do \
++	for dir in "$(man1dir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/src/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/src/Makefile.in	2010-04-08 13:07:21.000000000 +0200
+@@ -47,8 +47,8 @@
+ CONFIG_HEADER = $(top_builddir)/config.h
+ CONFIG_CLEAN_FILES =
+ CONFIG_CLEAN_VPATH_FILES =
+-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(gsql_gladedir)" \
+-	"$(DESTDIR)$(gsql_uidir)"
++am__installdirs = "$(bindir)" "$(DESTDIR)$(gsql_gladedir)" \
++	"$(DESTDIR)(gsql_uidir)"
+ PROGRAMS = $(bin_PROGRAMS)
+ am_gsql_OBJECTS = main.$(OBJEXT) gsqlcb.$(OBJEXT) gsql.$(OBJEXT) \
+ 	gsqlmenu.$(OBJEXT) gsqlconf.$(OBJEXT) gsqlconfcb.$(OBJEXT) \
+@@ -353,7 +353,7 @@
+ $(am__aclocal_m4_deps):
+ install-binPROGRAMS: $(bin_PROGRAMS)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
++	test -z "$(bindir)" || $(MKDIR_P) "$(bindir)"
+ 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+ 	for p in $$list; do echo "$$p $$p"; done | \
+ 	sed 's/$(EXEEXT)$$//' | \
+@@ -371,8 +371,8 @@
+ 	while read type dir files; do \
+ 	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+ 	    test -z "$$files" || { \
+-	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+-	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
++	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(bindir)$$dir'"; \
++	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(bindir)$$dir" || exit $$?; \
+ 	    } \
+ 	; done
+ 
+@@ -567,7 +567,7 @@
+ check: check-am
+ all-am: Makefile $(PROGRAMS) $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(gsql_gladedir)" "$(DESTDIR)$(gsql_uidir)"; do \
++	for dir in "$(bindir)" "$(DESTDIR)$(gsql_gladedir)" "$(DESTDIR)$(gsql_uidir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/po/Makefile.in.in	2010-04-08 12:30:21.000000000 +0200
++++ gsql-0.2.2.aleph/po/Makefile.in.in	2010-04-08 12:35:51.000000000 +0200
+@@ -128,9 +128,9 @@
+ install-data-no: all
+ install-data-yes: all
+ 	if test -r "$(MKINSTALLDIRS)"; then \
+-	  $(MKINSTALLDIRS) $(DESTDIR)$(datadir); \
++	  $(MKINSTALLDIRS) $(datadir); \
+ 	else \
+-	  $(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir); \
++	  $(SHELL) $(top_srcdir)/mkinstalldirs $(datadir); \
+ 	fi
+ 	@catalogs='$(CATALOGS)'; \
+ 	for cat in $$catalogs; do \
+@@ -140,7 +140,7 @@
+ 	    *)     destdir=$(localedir);; \
+ 	  esac; \
+ 	  lang=`echo $$cat | sed 's/\$(CATOBJEXT)$$//'`; \
+-	  dir=$(DESTDIR)$$destdir/$$lang/LC_MESSAGES; \
++	  dir=$$destdir/$$lang/LC_MESSAGES; \
+ 	  if test -r "$(MKINSTALLDIRS)"; then \
+ 	    $(MKINSTALLDIRS) $$dir; \
+ 	  else \
+@@ -170,12 +170,12 @@
+ 	done
+ 	if test "$(PACKAGE)" = "glib"; then \
+ 	  if test -r "$(MKINSTALLDIRS)"; then \
+-	    $(MKINSTALLDIRS) $(DESTDIR)$(gettextsrcdir); \
++	    $(MKINSTALLDIRS) $(gettextsrcdir); \
+ 	  else \
+-	    $(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(gettextsrcdir); \
++	    $(SHELL) $(top_srcdir)/mkinstalldirs $(gettextsrcdir); \
+ 	  fi; \
+ 	  $(INSTALL_DATA) $(srcdir)/Makefile.in.in \
+-			  $(DESTDIR)$(gettextsrcdir)/Makefile.in.in; \
++			  $(gettextsrcdir)/Makefile.in.in; \
+ 	else \
+ 	  : ; \
+ 	fi
+--- gsql-0.2.2/engines/mysql/Makefile.in	2010-03-25 07:14:31.000000000 +0100
++++ gsql-0.2.2.aleph/engines/mysql/Makefile.in	2010-04-08 12:55:20.000000000 +0200
+@@ -67,9 +67,9 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
+-	"$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" \
+-	"$(DESTDIR)$(schemadir)"
++am__installdirs = "$(libgsqldir)" \
++	"$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" \
++	"$(schemadir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgsqlengine_mysql_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+@@ -438,7 +438,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -446,8 +446,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -729,15 +729,15 @@
+ 	cd "$(DESTDIR)$(engine_uidir)" && rm -f $$files
+ install-schemaDATA: $(schema_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(schemadir)" || $(MKDIR_P) "$(DESTDIR)$(schemadir)"
++	test -z "$(schemadir)" || $(MKDIR_P) "$(schemadir)"
+ 	@list='$(schema_DATA)'; test -n "$(schemadir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(schemadir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(schemadir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(schemadir)'"; \
++	  $(INSTALL_DATA) $$files "$(schemadir)" || exit $$?; \
+ 	done
+ 
+ uninstall-schemaDATA:
+@@ -946,7 +946,7 @@
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs: installdirs-recursive
+ installdirs-am:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" "$(DESTDIR)$(schemadir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" "$(schemadir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-recursive
+--- gsql-0.2.2/libgsql/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/libgsql/Makefile.in	2010-04-08 12:46:09.000000000 +0200
+@@ -69,8 +69,8 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
+-	"$(DESTDIR)$(libgsqlincludedir)"
++am__installdirs = "$(libdir)" "$(pkgconfigdir)" \
++	"$(libgsqlincludedir)"
+ LTLIBRARIES = $(lib_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgsql_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+@@ -377,7 +377,7 @@
+ 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
++	test -z "$(libdir)" || $(MKDIR_P) "$(libdir)"
+ 	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -385,8 +385,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libdir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libdir)"; \
+ 	}
+ 
+ uninstall-libLTLIBRARIES:
+@@ -461,15 +461,15 @@
+ 	-rm -rf .libs _libs
+ install-pkgconfigDATA: $(pkgconfig_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(pkgconfigdir)" || $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)"
++	test -z "$(pkgconfigdir)" || $(MKDIR_P) "$(pkgconfigdir)"
+ 	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(pkgconfigdir)'"; \
++	  $(INSTALL_DATA) $$files "$(pkgconfigdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-pkgconfigDATA:
+@@ -481,15 +481,15 @@
+ 	cd "$(DESTDIR)$(pkgconfigdir)" && rm -f $$files
+ install-libgsqlincludeHEADERS: $(libgsqlinclude_HEADERS)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqlincludedir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqlincludedir)"
++	test -z "$(libgsqlincludedir)" || $(MKDIR_P) "$(libgsqlincludedir)"
+ 	@list='$(libgsqlinclude_HEADERS)'; test -n "$(libgsqlincludedir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libgsqlincludedir)'"; \
+-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libgsqlincludedir)" || exit $$?; \
++	  echo " $(INSTALL_HEADER) $$files '$(libgsqlincludedir)'"; \
++	  $(INSTALL_HEADER) $$files "$(libgsqlincludedir)" || exit $$?; \
+ 	done
+ 
+ uninstall-libgsqlincludeHEADERS:
+@@ -586,7 +586,7 @@
+ check: check-am
+ all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
+ installdirs:
+-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(libgsqlincludedir)"; do \
++	for dir in "$(libdir)" "$(pkgconfigdir)" "$(libgsqlincludedir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2.aleph/engines/postgresql/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2/engines/postgresql/Makefile.in	2010-04-08 13:39:24.000000000 +0200
+@@ -67,9 +67,9 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
++am__installdirs = "$(libgsqldir)" \
+ 	"$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" \
+-	"$(DESTDIR)$(schemadir)"
++	"$(schemadir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgsqlengine_pgsql_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+@@ -447,7 +447,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -455,8 +455,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -770,15 +770,15 @@
+ 	cd "$(DESTDIR)$(engine_uidir)" && rm -f $$files
+ install-schemaDATA: $(schema_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(schemadir)" || $(MKDIR_P) "$(DESTDIR)$(schemadir)"
++	test -z "$(schemadir)" || $(MKDIR_P) "$(schemadir)"
+ 	@list='$(schema_DATA)'; test -n "$(schemadir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(schemadir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(schemadir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(schemadir)'"; \
++	  $(INSTALL_DATA) $$files "$(schemadir)" || exit $$?; \
+ 	done
+ 
+ uninstall-schemaDATA:
+@@ -987,7 +987,7 @@
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs: installdirs-recursive
+ installdirs-am:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" "$(DESTDIR)$(schemadir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(engine_gladedir)" "$(DESTDIR)$(engine_uidir)" "$(schemadir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-recursive
+--- gsql-0.2.2/plugins/exporter/Makefile.in.dest	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2/plugins/exporter/Makefile.in	2010-04-08 13:54:52.000000000 +0200
+@@ -67,9 +67,9 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
++am__installdirs = "$(libgsqldir)" \
+ 	"$(DESTDIR)$(exporter_gladedir)" \
+-	"$(DESTDIR)$(exporter_pixmapsdir)" \
++	"$(exporter_pixmapsdir)" \
+ 	"$(DESTDIR)$(exporter_uidir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+@@ -352,7 +352,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -360,8 +360,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -487,15 +487,15 @@
+ 	cd "$(DESTDIR)$(exporter_gladedir)" && rm -f $$files
+ install-exporter_pixmapsDATA: $(exporter_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(exporter_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(exporter_pixmapsdir)"
++	test -z "$(exporter_pixmapsdir)" || $(MKDIR_P) "$(exporter_pixmapsdir)"
+ 	@list='$(exporter_pixmaps_DATA)'; test -n "$(exporter_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(exporter_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(exporter_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(exporter_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(exporter_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-exporter_pixmapsDATA:
+@@ -612,7 +612,7 @@
+ check: check-am
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(exporter_gladedir)" "$(DESTDIR)$(exporter_pixmapsdir)" "$(DESTDIR)$(exporter_uidir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(exporter_gladedir)" "$(exporter_pixmapsdir)" "$(DESTDIR)$(exporter_uidir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/plugins/runner/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/plugins/runner/Makefile.in	2010-04-08 13:51:53.000000000 +0200
+@@ -67,9 +67,9 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
++am__installdirs = "$(libgsqldir)" \
+ 	"$(DESTDIR)$(runner_gladedir)" \
+-	"$(DESTDIR)$(runner_pixmapsdir)" "$(DESTDIR)$(runner_uidir)"
++	"$(runner_pixmapsdir)" "$(DESTDIR)$(runner_uidir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgsqlplugin_runner_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+@@ -342,7 +342,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -350,8 +350,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -445,15 +445,15 @@
+ 	cd "$(DESTDIR)$(runner_gladedir)" && rm -f $$files
+ install-runner_pixmapsDATA: $(runner_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(runner_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(runner_pixmapsdir)"
++	test -z "$(runner_pixmapsdir)" || $(MKDIR_P) "$(runner_pixmapsdir)"
+ 	@list='$(runner_pixmaps_DATA)'; test -n "$(runner_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(runner_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(runner_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(runner_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(runner_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-runner_pixmapsDATA:
+@@ -570,7 +570,7 @@
+ check: check-am
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(runner_gladedir)" "$(DESTDIR)$(runner_pixmapsdir)" "$(DESTDIR)$(runner_uidir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(runner_gladedir)" "$(runner_pixmapsdir)" "$(DESTDIR)$(runner_uidir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/plugins/vte/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/plugins/vte/Makefile.in	2010-04-08 13:58:15.000000000 +0200
+@@ -67,8 +67,8 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
+-	"$(DESTDIR)$(vte_gladedir)" "$(DESTDIR)$(vte_pixmapsdir)" \
++am__installdirs = "$(libgsqldir)" \
++	"$(DESTDIR)$(vte_gladedir)" "$(vte_pixmapsdir)" \
+ 	"$(DESTDIR)$(vte_uidir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+@@ -339,7 +339,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -347,8 +347,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -450,15 +450,15 @@
+ 	cd "$(DESTDIR)$(vte_gladedir)" && rm -f $$files
+ install-vte_pixmapsDATA: $(vte_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(vte_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(vte_pixmapsdir)"
++	test -z "$(vte_pixmapsdir)" || $(MKDIR_P) "$(vte_pixmapsdir)"
+ 	@list='$(vte_pixmaps_DATA)'; test -n "$(vte_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(vte_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(vte_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(vte_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(vte_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-vte_pixmapsDATA:
+@@ -575,7 +575,7 @@
+ check: check-am
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(vte_gladedir)" "$(DESTDIR)$(vte_pixmapsdir)" "$(DESTDIR)$(vte_uidir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(vte_gladedir)" "$(vte_pixmapsdir)" "$(DESTDIR)$(vte_uidir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/plugins/tunnel/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/plugins/tunnel/Makefile.in	2010-04-08 14:03:57.000000000 +0200
+@@ -67,9 +67,9 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(libgsqldir)" \
++am__installdirs = "$(libgsqldir)" \
+ 	"$(DESTDIR)$(tunnel_gladedir)" \
+-	"$(DESTDIR)$(tunnel_pixmapsdir)" "$(DESTDIR)$(tunnel_uidir)"
++	"$(tunnel_pixmapsdir)" "$(DESTDIR)$(tunnel_uidir)"
+ LTLIBRARIES = $(libgsql_LTLIBRARIES)
+ am__DEPENDENCIES_1 =
+ libgsqlplugin_tunnel_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+@@ -338,7 +338,7 @@
+ $(am__aclocal_m4_deps):
+ install-libgsqlLTLIBRARIES: $(libgsql_LTLIBRARIES)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(libgsqldir)" || $(MKDIR_P) "$(DESTDIR)$(libgsqldir)"
++	test -z "$(libgsqldir)" || $(MKDIR_P) "$(libgsqldir)"
+ 	@list='$(libgsql_LTLIBRARIES)'; test -n "$(libgsqldir)" || list=; \
+ 	list2=; for p in $$list; do \
+ 	  if test -f $$p; then \
+@@ -346,8 +346,8 @@
+ 	  else :; fi; \
+ 	done; \
+ 	test -z "$$list2" || { \
+-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libgsqldir)'"; \
+-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libgsqldir)"; \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(libgsqldir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(libgsqldir)"; \
+ 	}
+ 
+ uninstall-libgsqlLTLIBRARIES:
+@@ -441,15 +441,15 @@
+ 	cd "$(DESTDIR)$(tunnel_gladedir)" && rm -f $$files
+ install-tunnel_pixmapsDATA: $(tunnel_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(tunnel_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(tunnel_pixmapsdir)"
++	test -z "$(tunnel_pixmapsdir)" || $(MKDIR_P) "$(tunnel_pixmapsdir)"
+ 	@list='$(tunnel_pixmaps_DATA)'; test -n "$(tunnel_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(tunnel_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(tunnel_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(tunnel_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(tunnel_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-tunnel_pixmapsDATA:
+@@ -566,7 +566,7 @@
+ check: check-am
+ all-am: Makefile $(LTLIBRARIES) $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(libgsqldir)" "$(DESTDIR)$(tunnel_gladedir)" "$(DESTDIR)$(tunnel_pixmapsdir)" "$(DESTDIR)$(tunnel_uidir)"; do \
++	for dir in "$(libgsqldir)" "$(DESTDIR)$(tunnel_gladedir)" "$(tunnel_pixmapsdir)" "$(DESTDIR)$(tunnel_uidir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/engines/postgresql/pixmaps/Makefile.in.dest	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2/engines/postgresql/pixmaps/Makefile.in	2010-04-08 15:43:53.000000000 +0200
+@@ -68,7 +68,7 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(pgsql_engine_pixmapsdir)"
++am__installdirs = "$(pgsql_engine_pixmapsdir)"
+ DATA = $(pgsql_engine_pixmaps_DATA)
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ ACLOCAL = @ACLOCAL@
+@@ -235,7 +235,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-pgsql_engine_pixmapsdir = $(prefix)/@NO_PREFIX_PACKAGE_PIXMAPS_DIR@/postgresql
++pgsql_engine_pixmapsdir = $(datadir)/../@NO_PREFIX_PACKAGE_PIXMAPS_DIR@/postgresql
+ pgsql_engine_pixmaps_DATA = \
+ 	pgsql.png \
+ 	process.list.png \
+@@ -284,15 +284,15 @@
+ 	-rm -rf .libs _libs
+ install-pgsql_engine_pixmapsDATA: $(pgsql_engine_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(pgsql_engine_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(pgsql_engine_pixmapsdir)"
++	test -z "$(pgsql_engine_pixmapsdir)" || $(MKDIR_P) "$(pgsql_engine_pixmapsdir)"
+ 	@list='$(pgsql_engine_pixmaps_DATA)'; test -n "$(pgsql_engine_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pgsql_engine_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pgsql_engine_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(pgsql_engine_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(pgsql_engine_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-pgsql_engine_pixmapsDATA:
+@@ -343,7 +343,7 @@
+ check: check-am
+ all-am: Makefile $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(pgsql_engine_pixmapsdir)"; do \
++	for dir in "$(pgsql_engine_pixmapsdir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/engines/mysql/pixmaps/Makefile.in.dest	2010-03-25 07:14:31.000000000 +0100
++++ gsql-0.2.2/engines/mysql/pixmaps/Makefile.in	2010-04-08 15:45:58.000000000 +0200
+@@ -68,7 +68,7 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(mysql_engine_pixmapsdir)"
++am__installdirs = "$(mysql_engine_pixmapsdir)"
+ DATA = $(mysql_engine_pixmaps_DATA)
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ ACLOCAL = @ACLOCAL@
+@@ -235,7 +235,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-mysql_engine_pixmapsdir = $(prefix)/@NO_PREFIX_PACKAGE_PIXMAPS_DIR@/mysql
++mysql_engine_pixmapsdir = $(datadir)/../@NO_PREFIX_PACKAGE_PIXMAPS_DIR@/mysql
+ mysql_engine_pixmaps_DATA = \
+ 	mysql.png          \
+ 	process.list.png          \
+@@ -284,15 +284,15 @@
+ 	-rm -rf .libs _libs
+ install-mysql_engine_pixmapsDATA: $(mysql_engine_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(mysql_engine_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(mysql_engine_pixmapsdir)"
++	test -z "$(mysql_engine_pixmapsdir)" || $(MKDIR_P) "$(mysql_engine_pixmapsdir)"
+ 	@list='$(mysql_engine_pixmaps_DATA)'; test -n "$(mysql_engine_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(mysql_engine_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(mysql_engine_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(mysql_engine_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(mysql_engine_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-mysql_engine_pixmapsDATA:
+@@ -343,7 +343,7 @@
+ check: check-am
+ all-am: Makefile $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(mysql_engine_pixmapsdir)"; do \
++	for dir in "$(mysql_engine_pixmapsdir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/pixmaps/Makefile.in.dest	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2/pixmaps/Makefile.in	2010-04-08 14:42:21.000000000 +0200
+@@ -68,8 +68,8 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(gsql_pixmapsdir)" \
+-	"$(DESTDIR)$(icondir)" "$(DESTDIR)$(svgicondir)"
++am__installdirs = "$(gsql_pixmapsdir)" \
++	"$(icondir)" "$(svgicondir)"
+ DATA = $(gsql_pixmaps_DATA) $(icon_DATA) $(svgicon_DATA)
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ ACLOCAL = @ACLOCAL@
+@@ -241,7 +241,7 @@
+ svgicondir = $(datadir)/icons/hicolor/scalable/apps
+ svgicon_DATA = gsql.svg
+ gtk_update_icon_cache = gtk-update-icon-cache -f -t $(datadir)/icons/hicolor
+-gsql_pixmapsdir = $(prefix)/@NO_PREFIX_PACKAGE_PIXMAPS_DIR@
++gsql_pixmapsdir = $(datadir)/../@NO_PREFIX_PACKAGE_PIXMAPS_DIR@
+ gsql_pixmaps_DATA = \
+ 	unknown.png\
+ 	close.png \
+@@ -336,15 +336,15 @@
+ 	-rm -rf .libs _libs
+ install-gsql_pixmapsDATA: $(gsql_pixmaps_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(gsql_pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(gsql_pixmapsdir)"
++	test -z "$(gsql_pixmapsdir)" || $(MKDIR_P) "$(gsql_pixmapsdir)"
+ 	@list='$(gsql_pixmaps_DATA)'; test -n "$(gsql_pixmapsdir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(gsql_pixmapsdir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(gsql_pixmapsdir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(gsql_pixmapsdir)'"; \
++	  $(INSTALL_DATA) $$files "$(gsql_pixmapsdir)" || exit $$?; \
+ 	done
+ 
+ uninstall-gsql_pixmapsDATA:
+@@ -356,15 +356,15 @@
+ 	cd "$(DESTDIR)$(gsql_pixmapsdir)" && rm -f $$files
+ install-iconDATA: $(icon_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(icondir)" || $(MKDIR_P) "$(DESTDIR)$(icondir)"
++	test -z "$(icondir)" || $(MKDIR_P) "$(icondir)"
+ 	@list='$(icon_DATA)'; test -n "$(icondir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(icondir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(icondir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(icondir)'"; \
++	  $(INSTALL_DATA) $$files "$(icondir)" || exit $$?; \
+ 	done
+ 
+ uninstall-iconDATA:
+@@ -376,15 +376,15 @@
+ 	cd "$(DESTDIR)$(icondir)" && rm -f $$files
+ install-svgiconDATA: $(svgicon_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(svgicondir)" || $(MKDIR_P) "$(DESTDIR)$(svgicondir)"
++	test -z "$(svgicondir)" || $(MKDIR_P) "$(svgicondir)"
+ 	@list='$(svgicon_DATA)'; test -n "$(svgicondir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(svgicondir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(svgicondir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(svgicondir)'"; \
++	  $(INSTALL_DATA) $$files "$(svgicondir)" || exit $$?; \
+ 	done
+ 
+ uninstall-svgiconDATA:
+@@ -435,7 +435,7 @@
+ check: check-am
+ all-am: Makefile $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(gsql_pixmapsdir)" "$(DESTDIR)$(icondir)" "$(DESTDIR)$(svgicondir)"; do \
++	for dir in "$(gsql_pixmapsdir)" "$(icondir)" "$(svgicondir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-am
+--- gsql-0.2.2/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/Makefile.in	2010-04-08 14:19:16.000000000 +0200
+@@ -81,8 +81,8 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(gnomemenudir)" \
+-	"$(DESTDIR)$(gsqldocdir)" "$(DESTDIR)$(schemadir)"
++am__installdirs = "$(gnomemenudir)" \
++	"$(DESTDIR)$(gsqldocdir)" "$(schemadir)"
+ DATA = $(gnomemenu_DATA) $(gsqldoc_DATA) $(schema_DATA)
+ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+   distclean-recursive maintainer-clean-recursive
+@@ -372,15 +372,15 @@
+ 	-rm -f libtool config.lt
+ install-gnomemenuDATA: $(gnomemenu_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(gnomemenudir)" || $(MKDIR_P) "$(DESTDIR)$(gnomemenudir)"
++	test -z "$(gnomemenudir)" || $(MKDIR_P) "$(gnomemenudir)"
+ 	@list='$(gnomemenu_DATA)'; test -n "$(gnomemenudir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(gnomemenudir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(gnomemenudir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(gnomemenudir)'"; \
++	  $(INSTALL_DATA) $$files "$(gnomemenudir)" || exit $$?; \
+ 	done
+ 
+ uninstall-gnomemenuDATA:
+@@ -412,15 +412,15 @@
+ 	cd "$(DESTDIR)$(gsqldocdir)" && rm -f $$files
+ install-schemaDATA: $(schema_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(schemadir)" || $(MKDIR_P) "$(DESTDIR)$(schemadir)"
++	test -z "$(schemadir)" || $(MKDIR_P) "$(schemadir)"
+ 	@list='$(schema_DATA)'; test -n "$(schemadir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(schemadir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(schemadir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(schemadir)'"; \
++	  $(INSTALL_DATA) $$files "$(schemadir)" || exit $$?; \
+ 	done
+ 
+ uninstall-schemaDATA:
+@@ -748,7 +748,7 @@
+ all-am: Makefile $(DATA) config.h
+ installdirs: installdirs-recursive
+ installdirs-am:
+-	for dir in "$(DESTDIR)$(gnomemenudir)" "$(DESTDIR)$(gsqldocdir)" "$(DESTDIR)$(schemadir)"; do \
++	for dir in "$(gnomemenudir)" "$(DESTDIR)$(gsqldocdir)" "$(schemadir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-recursive
+--- gsql-0.2.2/plugins/Makefile.in	2010-03-25 07:14:32.000000000 +0100
++++ gsql-0.2.2.aleph/plugins/Makefile.in	2010-04-08 14:36:21.000000000 +0200
+@@ -77,7 +77,7 @@
+ am__base_list = \
+   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+-am__installdirs = "$(DESTDIR)$(schemadir)"
++am__installdirs = "$(schemadir)"
+ DATA = $(schema_DATA)
+ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+   distclean-recursive maintainer-clean-recursive
+@@ -324,15 +324,15 @@
+ 	-rm -rf .libs _libs
+ install-schemaDATA: $(schema_DATA)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(schemadir)" || $(MKDIR_P) "$(DESTDIR)$(schemadir)"
++	test -z "$(schemadir)" || $(MKDIR_P) "$(schemadir)"
+ 	@list='$(schema_DATA)'; test -n "$(schemadir)" || list=; \
+ 	for p in $$list; do \
+ 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+ 	  echo "$$d$$p"; \
+ 	done | $(am__base_list) | \
+ 	while read files; do \
+-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(schemadir)'"; \
+-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(schemadir)" || exit $$?; \
++	  echo " $(INSTALL_DATA) $$files '$(schemadir)'"; \
++	  $(INSTALL_DATA) $$files "$(schemadir)" || exit $$?; \
+ 	done
+ 
+ uninstall-schemaDATA:
+@@ -541,7 +541,7 @@
+ all-am: Makefile $(DATA)
+ installdirs: installdirs-recursive
+ installdirs-am:
+-	for dir in "$(DESTDIR)$(schemadir)"; do \
++	for dir in "$(schemadir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: install-recursive
+
