@@ -1,6 +1,6 @@
 Name:           gsql
 Version:        0.2.2
-Release:        %mkrel 4
+Release:        4
 Summary:        Integrated database development tool for GNOME
 Group:          Development/Databases
 License:        GPLv2+
@@ -9,10 +9,9 @@ Source0:        http://gsql.googlecode.com/files/gsql-%{version}.tar.bz2
 Patch1:		gsql-0.2.2-mysql_cursor-format-not-string-literal-and-no-format.patch
 Patch2:		gsql-0.2.2-DESTDIR-duplicate.patch
 Patch3:		gsql-0.2.2-libnotify0.7.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}
-BuildRequires:  gtk2-devel, libGConf2-devel, libglade2-devel, libgtksourceview-2.0-devel
-BuildRequires:  libgnome2-devel, libgnomeui2-devel, vte-devel, mysql-devel
-BuildRequires:  libnotify-devel desktop-file-utils gettext
+BuildRequires:  pkgconfig(gtk+-2.0), pkgconfig(gconf-2.0), pkgconfig(libglade-2.0), libgtksourceview-2.0-devel
+BuildRequires:  libgnome2-devel, pkgconfig(libgnomeui-2.0), vte-devel, mysql-devel
+BuildRequires:  pkgconfig(libnotify) desktop-file-utils gettext
 BuildRequires:  postgresql-devel, libssh-devel >= 1:0.4.2
 Requires:       %{name}-engine-mysql = %{version}-%{release}
 Requires:       %{name}-engine-postgresql = %{version}-%{release}
@@ -97,16 +96,11 @@ PostgreSQL engine for GSQL
 %make
 
 %install
-rm -rf %{buildroot}
 %makeinstall DESTDIR=%buildroot
-find %{buildroot} -name '*.la' -delete
 %find_lang %{name}
 # remove improperly placed docs
 rm -rf %{buildroot}%{_defaultdocdir}/%{name}
 
-
-%clean
-rm -rf %{buildroot}
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
@@ -168,3 +162,26 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}/ui/postgresql/
 %{_datadir}/%{name}/glade/postgresql/
 %{_datadir}/pixmaps/%{name}/postgresql/
+
+
+%changelog
+* Mon May 23 2011 Funda Wang <fwang@mandriva.org> 0.2.2-4mdv2011.0
++ Revision: 677507
+- move .so into devel package
+
+* Sat Apr 23 2011 Funda Wang <fwang@mandriva.org> 0.2.2-3
++ Revision: 656817
+- build with libnotify 0.7
+
+* Sun Dec 05 2010 Oden Eriksson <oeriksson@mandriva.com> 0.2.2-2mdv2011.0
++ Revision: 610987
+- rebuild
+
+* Fri Apr 09 2010 Lonyai Gergely <aleph@mandriva.org> 0.2.2-1mdv2010.1
++ Revision: 533361
+- Probe fix the libssh-devel version with epoch
+- rebuild
+- Fix the release tag
+- initial release
+- create gsql
+
