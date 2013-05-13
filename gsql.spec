@@ -10,7 +10,7 @@ Patch1:		gsql-0.2.2-mysql_cursor-format-not-string-literal-and-no-format.patch
 Patch2:		gsql-0.2.2-DESTDIR-duplicate.patch
 Patch3:		gsql-0.2.2-libnotify0.7.patch
 BuildRequires:  pkgconfig(gtk+-2.0), pkgconfig(gconf-2.0), pkgconfig(libglade-2.0), libgtksourceview-2.0-devel
-BuildRequires:  libgnome2-devel, pkgconfig(libgnomeui-2.0), vte-devel, mysql-devel
+BuildRequires:  pkgconfig(libgnome-2.0), pkgconfig(libgnomeui-2.0), vte-devel, mysql-devel
 BuildRequires:  pkgconfig(libnotify) desktop-file-utils gettext
 BuildRequires:  postgresql-devel, libssh-devel >= 1:0.4.2
 Requires:       %{name}-engine-mysql = %{version}-%{release}
