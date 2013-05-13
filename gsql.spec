@@ -1,6 +1,6 @@
 Name:           gsql
 Version:        0.2.2
-Release:        4
+Release:        5
 Summary:        Integrated database development tool for GNOME
 Group:          Development/Databases
 License:        GPLv2+
