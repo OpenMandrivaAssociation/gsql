@@ -4,7 +4,7 @@ Release:        6
 Summary:        Integrated database development tool for GNOME
 Group:          Development/Databases
 License:        GPLv2+
-URL:            http://gsql.org
+URL:            https://gsql.org
 Source0:        http://gsql.googlecode.com/files/gsql-%{version}.tar.bz2
 Patch1:		gsql-0.2.2-mysql_cursor-format-not-string-literal-and-no-format.patch
 Patch2:		gsql-0.2.2-DESTDIR-duplicate.patch
